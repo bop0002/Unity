@@ -46,8 +46,21 @@ public class Board : MonoBehaviour
         TetrominoData data = this.tetrominos[random];
 
         this.ActivePiece.Inititalze(this, this.SpawnPosition, data);
-        Set(this.ActivePiece);
 
+        if(IsValidPosition(ActivePiece,SpawnPosition))
+        {
+            Set(this.ActivePiece);
+        }
+        else
+        {
+            GameOver();
+        }
+
+    }
+
+    public void GameOver()
+    {
+        this.TileMap.ClearAllTiles();
     }
 
     public void Set(Pieces piece)
@@ -90,6 +103,64 @@ public class Board : MonoBehaviour
         }
         return true;
 
+    }
+    public void ClearLines()
+    {
+        RectInt bounds = Bounds;
+        int row = bounds.yMin;
+
+        while (row < bounds.yMax)
+        {
+            if (IsLineFull(row))
+            {
+                LineClear(row);
+            }
+            else
+            {
+                row++;
+            }
+        }
+    }
+
+    public bool IsLineFull(int row)
+    {
+        RectInt bounds = Bounds;
+
+        for (int col = bounds.xMin; col < bounds.xMax; col++)
+        {
+            Vector3Int position = new Vector3Int(col, row, 0);
+            if (!TileMap.HasTile(position))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public void LineClear(int row)
+    {
+        RectInt bounds = Bounds;
+
+        for (int col = bounds.xMin; col < bounds.xMax; col++)
+        {
+            Vector3Int position = new Vector3Int(col, row, 0);
+            TileMap.SetTile(position, null);
+        }
+
+        while (row < bounds.yMax)
+        {
+            for (int col = bounds.xMin; col < bounds.xMax; col++)
+            {
+                Vector3Int position = new Vector3Int(col, row + 1, 0);
+                TileBase above = TileMap.GetTile(position);
+
+                position = new Vector3Int(col, row, 0);
+                TileMap.SetTile(position, above);
+            }
+
+            row++;
+        }
     }
 
 

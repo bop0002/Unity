@@ -197,6 +197,7 @@ MonoBehaviour:
   - tetromino: 6
     tiles: {fileID: 11400000, guid: 84195909fb6fa9e49855a9e0e420261f, type: 2}
   SpawnPosition: {x: -1, y: 8, z: 0}
+  BOARD_SIZE: {x: 10, y: 20}
 --- !u!114 &202802779
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -209,6 +210,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f13966611b5092c4f8a27420e4bf1ced, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  stepDelay: 1
+  moveDelay: 0.1
+  lockDelay: 0.5
 --- !u!1 &363866804
 GameObject:
   m_ObjectHideFlags: 0
@@ -282,7 +286,7 @@ TilemapRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 2
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
   m_MaxChunkCount: 16
@@ -515,6 +519,7 @@ GameObject:
   m_Component:
   - component: {fileID: 755743818}
   - component: {fileID: 755743817}
+  - component: {fileID: 755743819}
   m_Layer: 0
   m_Name: Ghost
   m_TagString: Untagged
@@ -550,6 +555,21 @@ Transform:
   - {fileID: 363866805}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &755743819
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 755743816}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2dcce599592f597488fa746f6ad0d03b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tile: {fileID: 11400000, guid: 4b4eb46a26e180a46ae7e1fc6bf512aa, type: 2}
+  mainBoard: {fileID: 202802778}
+  trackingPiece: {fileID: 202802779}
 --- !u!1 &1275578070
 GameObject:
   m_ObjectHideFlags: 0

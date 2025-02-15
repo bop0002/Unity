@@ -12,11 +12,25 @@ public class Pieces : MonoBehaviour
     public Vector3Int[] Cells { get; private set; }
     public int RotationIndex { get; private set; }
 
+    public float stepDelay = 1f;
+    public float moveDelay = 0.1f;
+    public float lockDelay = 0.5f;
+
+    private float stepTime;
+    private float moveTime;
+    private float lockTime;
+
     public void Inititalze(Board board, Vector3Int position, TetrominoData data)
     {
         this.Board = board;
         this.Position = position;
         this.TetroData = data;
+
+        RotationIndex = 0;
+
+        stepTime = Time.time + stepDelay;
+        moveTime = Time.time + moveDelay;
+        lockTime = 0f;
 
         if (this.Cells == null) this.Cells = new Vector3Int[data.Cells.Length];
 
@@ -31,7 +45,17 @@ public class Pieces : MonoBehaviour
 
         this.Board.Clear(this);
 
-        HandleInput();
+        lockTime += Time.deltaTime;
+
+
+        if (Time.time > moveTime)
+        {
+            HandleInput();
+        }
+        if (Time.time > stepTime)
+        {
+            Step();
+        }
 
         this.Board.Set(this);
     }
@@ -39,7 +63,7 @@ public class Pieces : MonoBehaviour
     private void HandleInput()
     {
 
-        if(Input.GetKeyDown(KeyCode.Q))
+        if (Input.GetKeyDown(KeyCode.Q))
         {
             Rotate(-1);
         }
@@ -75,6 +99,25 @@ public class Pieces : MonoBehaviour
             }
     }
 
+    private void Step()
+    {
+        stepTime = Time.time + stepDelay;
+
+        Move(Vector2Int.down);
+
+        if (lockTime >= lockDelay)
+        {
+            Lock();
+        }
+    }
+
+    private void Lock()
+    {
+        Board.Set(this);
+        Board.ClearLines();
+        Board.SpawnPiece();
+    }
+
     private bool Move(Vector2Int transalation)
     {
         Vector3Int newPosition = this.Position;
@@ -88,6 +131,8 @@ public class Pieces : MonoBehaviour
         if(valid)
         {
             this.Position = newPosition;
+            moveTime = Time.time + moveDelay;
+            lockTime = 0f;
         }
         return valid;
 
@@ -95,8 +140,17 @@ public class Pieces : MonoBehaviour
 
     private void Rotate(int direction)
     {
+
+        int originalRotation = RotationIndex;
+
         this.RotationIndex = Wrap(this.RotationIndex + direction, 0, 4);
         HandleRotationMatrix(direction);
+
+        if (!TestWallKicks(RotationIndex, direction))
+        {
+            RotationIndex = originalRotation;
+            HandleRotationMatrix(-direction);
+        }
     }
 
     private void HandleRotationMatrix(int direction)
@@ -125,6 +179,36 @@ public class Pieces : MonoBehaviour
             this.Cells[i] = new Vector3Int(x, y, 0);
         }
     }
+
+    private bool TestWallKicks(int rotationIndex, int rotationDirection)
+    {
+        int wallKickIndex = GetWallKickIndex(rotationIndex, rotationDirection);
+
+        for (int i = 0; i < TetroData.WallKicks.GetLength(1); i++)
+        {
+            Vector2Int translation = TetroData.WallKicks[wallKickIndex, i];
+
+            if (Move(translation))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private int GetWallKickIndex(int rotationIndex, int rotationDirection)
+    {
+        int wallKickIndex = rotationIndex * 2;
+
+        if (rotationDirection < 0)
+        {
+            wallKickIndex--;
+        }
+
+        return Wrap(wallKickIndex, TetroData.WallKicks.GetLength(0), 0);
+    }
+
 
     private int Wrap(int input, int max,int min)
     {
