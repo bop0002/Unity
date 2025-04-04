@@ -2,10 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-
+using TMPro;
 
 public class Board : MonoBehaviour
 {
+    public TMP Text { get; private set; }
     public Tilemap TileMap { get; private set; }
     public TetrominoData[] tetrominos;
     public Pieces ActivePiece { get; private set; }
@@ -14,6 +15,7 @@ public class Board : MonoBehaviour
 
     public Vector2Int BOARD_SIZE = new Vector2Int(10, 20);
 
+    private int Point;
     public RectInt Bounds
     {
         get
@@ -27,6 +29,9 @@ public class Board : MonoBehaviour
     {
         this.TileMap = GetComponentInChildren<Tilemap>();
         this.ActivePiece = GetComponentInChildren<Pieces>();
+        this.Text = GetComponentInChildren<TMP>();
+
+        Point = 0;
 
         for(int i = 0; i < tetrominos.Length; i++)
         {
@@ -34,7 +39,10 @@ public class Board : MonoBehaviour
         }
             
     }
-
+    private void Update()
+    {
+        Text.Change(Point);
+    }
     private void Start()
     {
         SpawnPiece();
@@ -42,12 +50,12 @@ public class Board : MonoBehaviour
 
     public void SpawnPiece()
     {
-        int random = Random.Range(0,this.tetrominos.Length);
+        int random = Random.Range(0, this.tetrominos.Length);
         TetrominoData data = this.tetrominos[random];
-
         this.ActivePiece.Inititalze(this, this.SpawnPosition, data);
 
-        if(IsValidPosition(ActivePiece,SpawnPosition))
+        //SPAWn PIECFE
+        if (IsValidPosition(ActivePiece,SpawnPosition))
         {
             Set(this.ActivePiece);
         }
@@ -61,6 +69,7 @@ public class Board : MonoBehaviour
     public void GameOver()
     {
         this.TileMap.ClearAllTiles();
+        Point = 0;
     }
 
     public void Set(Pieces piece)
@@ -114,6 +123,7 @@ public class Board : MonoBehaviour
             if (IsLineFull(row))
             {
                 LineClear(row);
+                Point += 1000;
             }
             else
             {
